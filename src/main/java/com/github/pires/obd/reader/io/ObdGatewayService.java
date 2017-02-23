@@ -22,7 +22,6 @@ import com.github.pires.obd.enums.ObdProtocols;
 import com.github.pires.obd.exceptions.UnsupportedCommandException;
 import com.github.pires.obd.reader.R;
 import com.github.pires.obd.reader.activity.ConfigActivity;
-import com.github.pires.obd.reader.activity.MainActivity;
 import com.github.pires.obd.reader.io.ObdCommandJob.ObdCommandJobState;
 import com.google.inject.Inject;
 
@@ -115,9 +114,10 @@ public class ObdGatewayService extends AbstractGatewayService {
         try {
             sock = BluetoothManager.connect(dev);
         } catch (Exception e2) {
-            Log.e(TAG, "There was an error while establishing Bluetooth connection. Stopping app..", e2);
-            stopService();
-            throw new IOException();
+            Log.e(TAG, "There was an error while establishing Bluetooth connection.", e2);
+            //stopService();
+            //throw new IOException();
+            return;
         }
 
         // Let's configure the connection.
@@ -217,12 +217,15 @@ public class ObdGatewayService extends AbstractGatewayService {
 
             if (job != null) {
                 final ObdCommandJob job2 = job;
-                ((MainActivity) ctx).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((MainActivity) ctx).stateUpdate(job2);
-                    }
-                });
+                Log.e(TAG, "calling state update");
+                Log.e(TAG, job.getCommand().getResult());
+                ((ObdProgressListener) ctx).stateUpdate(job2);
+//                ((MainActivity) ctx).runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        ((MainActivity) ctx).stateUpdate(job2);
+//                    }
+//                });
             }
         }
     }
